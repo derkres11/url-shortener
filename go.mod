@@ -2,7 +2,10 @@ module modules
 
 go 1.25.0
 
-require github.com/ilyakaznacheev/cleanenv v1.5.0
+require (
+	github.com/ilyakaznacheev/cleanenv v1.5.0
+	golang.org/x/exp v0.0.0-20260209203927-2842357ff358
+)
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
