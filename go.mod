@@ -3,6 +3,7 @@ module modules
 go 1.25.0
 
 require (
+	github.com/go-chi/chi/v5 v5.2.5
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/mattn/go-sqlite3 v1.14.34
 	golang.org/x/exp v0.0.0-20260209203927-2842357ff358
