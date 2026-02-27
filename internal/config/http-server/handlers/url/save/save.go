@@ -23,7 +23,7 @@ type Response struct {
 	Alias    string `json:"alias,omitempty"`
 }
 
-//go:generate go run github.com/golang/mock/mockgen -destination=./mocks/url_saver_mock.go -package=mocks . URLSaver
+	//go:generate go run github.com/golang/mock/mockgen -destination=./mocks/url_saver_mock.go -package=mocks . URLSaver
 type URLSaver interface {
 	SaveURL(shortURL, originalURL string) error
 }

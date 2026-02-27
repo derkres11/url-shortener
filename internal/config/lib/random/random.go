@@ -11,7 +11,6 @@ func NewRandomString(size int) string {
 	chars := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
 	b := make([]rune, size)
-
 	for i := range b {
 		b[i] = chars[rnd.Intn(len(chars))]
 	}
