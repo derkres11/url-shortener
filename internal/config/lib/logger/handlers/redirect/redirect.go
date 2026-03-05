@@ -28,7 +28,7 @@ func New(log *slog.Logger, urlGetter URLGetter) http.HandlerFunc {
 			return
 		}
 
-		resUrl, err = urlGetter.GetUrl(alias)
+		resUrl, err := urlGetter.GetUrl(alias)
 		if err != nil {
 			log.Error("Failed to get URL", "error", err)
 			http.Error(w, "URL not found", http.StatusNotFound)
