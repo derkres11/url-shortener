@@ -2,13 +2,13 @@ package save
 
 import (
 	"errors"
-	"fmt"
 	"modules/internal/config/lib/api/response"
 	"modules/internal/config/lib/logger/sl"
 	"modules/internal/config/lib/random"
 	"modules/internal/config/storage"
 	"net/http"
 
+	"github.com/go-chi/render"
 	"github.com/go-playground/validator/v10"
 	"golang.org/x/exp/slog"
 )
@@ -23,7 +23,9 @@ type Response struct {
 	Alias    string `json:"alias,omitempty"`
 }
 
-	//go:generate go run github.com/golang/mock/mockgen -destination=./mocks/url_saver_mock.go -package=mocks . URLSaver
+const aliasLength = 8 // You can adjust the length as needed
+
+//go:generate go run github.com/golang/mock/mockgen -destination=./mocks/url_saver_mock.go -package=mocks . URLSaver
 type URLSaver interface {
 	SaveURL(shortURL, originalURL string) error
 }
@@ -33,9 +35,9 @@ func New(log *slog.Logger, saver URLSaver) http.HandlerFunc {
 		log.Info("Save URL handler called")
 
 		var req Request
-		err := render.DecodeJSON(r.body, &req)
+		err := render.DecodeJSON(r.Body, &req)
 		if err != nil {
-			fmt.Errorf("Failed to decode request body: %w", err)
+			// Failed to decode request body
 
 			render.JSON(w, r, response.Error("Invalid request body"))
 
@@ -45,8 +47,6 @@ func New(log *slog.Logger, saver URLSaver) http.HandlerFunc {
 		log.Info("Request body decoded", "url", req.URL, "alias", req.Alias)
 
 		if err := validator.New().Struct(req); err != nil {
-			validateErr := err.(validator.ValidationErrors)
-
 			log.Error("Validation failed", sl.Err(err))
 
 			render.JSON(w, r, response.Error("Invalid request body"))
@@ -59,7 +59,7 @@ func New(log *slog.Logger, saver URLSaver) http.HandlerFunc {
 			alias = random.NewRandomString(aliasLength)
 		}
 
-		id, err = url.saver.SaveURL(alias, req.URL)
+		err = saver.SaveURL(alias, req.URL)
 		if errors.Is(err, storage.ErrURLAlreadyExists) {
 			log.Info("url already exists", slog.String("url", req.URL))
 
@@ -76,7 +76,7 @@ func New(log *slog.Logger, saver URLSaver) http.HandlerFunc {
 			return
 		}
 
-		log.Info("url added", slog.Int64("id", id))
+		log.Info("url added", slog.String("alias", alias))
 
 		responseOK(w, r, alias)
 	}
@@ -84,7 +84,7 @@ func New(log *slog.Logger, saver URLSaver) http.HandlerFunc {
 
 func responseOK(w http.ResponseWriter, r *http.Request, alias string) {
 	render.JSON(w, r, Response{
-		Response: resp.OK(),
+		Response: response.OK(),
 		Alias:    alias,
 	})
 }

@@ -13,6 +13,11 @@ type Storage struct {
 	db *sql.DB
 }
 
+// GetUrl implements [redirect.URLGetter].
+func (s *Storage) GetUrl(alias string) (string, error) {
+	panic("unimplemented")
+}
+
 func New(StoragePath string) (*Storage, error) {
 	const op = "storage.sqlite.New"
 
@@ -40,25 +45,25 @@ func New(StoragePath string) (*Storage, error) {
 	return &Storage{db: db}, nil
 
 }
-func (s *Storage) SaveURL(urlToSave string, alias string) (int64, error) {
+func (s *Storage) SaveURL(urlToSave string, alias string) error {
 	const op = "storage.sqlite.SaveURL"
 
 	stmt, err := s.db.Prepare("INSERT INTO url(url, alias) VALUES(?, ?)")
 	if err != nil {
-		return 0, fmt.Errorf("%s: %w", op, err)
+		return fmt.Errorf("%s: %w", op, err)
 	}
 
 	res, err := stmt.Exec(urlToSave, alias)
 	if err != nil {
-		return 0, fmt.Errorf("%s: %w", op, err)
+		return fmt.Errorf("%s: %w", op, err)
 	}
 
-	id, err := res.LastInsertId()
+	_, err = res.LastInsertId()
 	if err != nil {
-		return 0, fmt.Errorf("%s: %w", op, err)
+		return fmt.Errorf("%s: %w", op, err)
 	}
 
-	return id, nil
+	return nil
 }
 
 func (s *Storage) GetURL(alias string) (string, error) {
